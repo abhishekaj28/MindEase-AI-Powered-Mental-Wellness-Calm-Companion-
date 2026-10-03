@@ -1,73 +1,80 @@
-# Welcome to your Lovable project
+# MindEase - Calm Companion
 
-## Project info
+A hackathon prototype of a gentle mental wellness web app: a mood check-in, a weekly mood dashboard, a supportive chat companion, and guided breathing exercises.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+> **Important disclaimer:** MindEase is **not a medical device**, is not a diagnostic or treatment tool, and is **not a substitute for professional mental health care, therapy, or emergency services**. If you are in crisis, or think you may harm yourself or others, contact your local emergency number or a qualified crisis line or professional right away. The app does not currently provide crisis resources or escalation of any kind.
 
-## How can I edit this code?
+## Honest status: is the AI real?
 
-There are several ways of editing your application.
+**No. There is no real AI or LLM in this project.** The code contains no API calls, no AI SDK, no API keys and no backend. The "AI companion" in the Chat page is a rule-based script (`src/hooks/useChat.ts`):
 
-**Use Lovable**
+- Your message is lowercased and matched against hard-coded keyword lists (for example "sad", "stress", "angry", "hopeless").
+- A canned reply is then picked at random from predefined response lists, with a simple conversation state machine that can suggest the breathing exercise.
+- A 1-2 second delay is added on purpose to simulate "thinking".
+- Matching is naive substring matching, so it can misread messages (for example "no" or "hi" appearing inside other words). It does not understand context.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+Despite the name, treat the chat as a scripted prototype only.
 
-Changes made via Lovable will be committed automatically to this repo.
+## What is implemented
 
-**Use your preferred IDE**
+| Feature | Status |
+|---|---|
+| Daily mood check-in (happy / okay / sad / stressed) with optional reflection | Working; saved in the browser's `localStorage` (key `mindease_moods`) |
+| "Your Journey" dashboard: 7-day mood chart and weekly counts | Working, computed from locally stored check-ins (Recharts) |
+| Chat companion | Working UI, **scripted/keyword-based replies (mock)** |
+| Calm Mode breathing: Calm (4-4-6) and Box (4-4-4-4) | Working animated guide |
+| Mood sounds | Short tones generated in-browser with the Web Audio API (no audio files) |
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+All data stays in your browser. There is no account system, server, database or analytics in the code.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## Tech stack
 
-Follow these steps:
+From `package.json`:
+
+- React 18, TypeScript, Vite 5 (`@vitejs/plugin-react-swc`)
+- Tailwind CSS 3 with `tailwindcss-animate` and `@tailwindcss/typography`
+- shadcn/ui (Radix UI primitives), `lucide-react` icons
+- React Router 6, TanStack React Query (set up but not used for any network calls), React Hook Form + Zod
+- Framer Motion, Recharts, Sonner toasts
+- ESLint 9 with typescript-eslint
+- Scaffolded with Lovable (`lovable-tagger` dev dependency)
+
+## Run locally
+
+Requires Node.js and npm.
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+npm install
+npm run dev        # start the dev server (Vite prints the local URL)
+npm run build      # production build into dist/
+npm run preview    # serve the production build locally
+npm run lint       # run ESLint
 ```
 
-**Edit a file directly in GitHub**
+`npm install` and `npm run build` were run successfully during the writing of this README (Vite warns that the main JS chunk is over 500 kB). `npm run lint` and `build:dev` were not run. No environment variables or API keys are needed.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Project structure
 
-**Use GitHub Codespaces**
+```
+src/
+  pages/        Index (check-in), Dashboard, Chat, CalmMode, NotFound
+  components/   BreathingCircle, ChatMessage, Mood* components, Navigation, ui/ (shadcn)
+  hooks/        useChat (scripted replies), useMoodStorage (localStorage), useMoodSounds (Web Audio)
+  lib/          utils
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Routes: `/`, `/dashboard`, `/chat`, `/calm`.
 
-## What technologies are used for this project?
+## Known limitations
 
-This project is built with:
+- Chat is rule-based and keyword-matched, not AI; replies can be repetitive or inappropriate to what the user wrote.
+- No crisis detection beyond a keyword that triggers a breathing suggestion, and no helpline or emergency information is shown.
+- Data lives only in one browser's `localStorage`: no sync, no backup, no export, and clearing site data erases it.
+- Chat history is not persisted.
+- No automated tests are present.
+- `index.html` still has placeholder "Lovable App" title and description metadata, and the `package.json` name is still the scaffold default (`vite_react_shadcn_ts`).
+- No deployment is configured or linked.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Credits
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Created by **AJ Abhishek** and **aman1011019** (the repository's two commit authors) as a hackathon project. Built with a Lovable scaffold, shadcn/ui, and Radix UI.
